@@ -2,7 +2,7 @@
 
 GraphQL backend boilerplates that can be deployed on serverless platforms.
 
-In theory, GraphQL and Serverless are supposed to work well together. Serverless gives a scalable platform to deploy a GraphQL backend instantly. . Although in practice, there are few reasons why this is not convenient:
+In theory, GraphQL and Serverless are supposed to work well together. Serverless gives a scalable platform to deploy a GraphQL backend instantly. Although in practice, there are few reasons why this is not convenient:
 
 1) **Serverless is new**: Developing, testing and deploying on serverless is not mature.
 2) **Database connections with serverless**: GraphQL backends need database connections that cannot scale at the same rate as serverless invocations.
