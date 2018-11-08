@@ -4,13 +4,7 @@ const Sequelize = require("sequelize");
 const POSTGRES_CONNECTION_STRING = process.env.POSTGRES_CONNECTION_STRING || "postgres://postgres@localhost:5432/postgres"
 
 const sequelize = new Sequelize(
-    POSTGRES_CONNECTION_STRING,
-    {
-        ssl: true,
-        dialectOptions: {
-            ssl: true
-        }
-    }
+    POSTGRES_CONNECTION_STRING, {}
 );
 
 const Author = sequelize.define('author', {
