@@ -69,6 +69,7 @@ const resolvers = {
 
                 return author;
             } catch (e) {
+                console.log(e);
                 throw new Error(e);
             }
         },
@@ -81,6 +82,7 @@ const resolvers = {
                 });
                 return article;
             } catch (e) {
+                console.log(e);
                 throw new Error(e);
             }
         }
