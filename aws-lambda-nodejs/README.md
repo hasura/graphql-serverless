@@ -123,8 +123,22 @@ And that's it. Hit save and visit the endpoint again. You will see the graphql p
 
 NOTE: You may have to edit the GraphQL URL in the playground to reflect the right endpoint ( same as the URL in the browser ).
 
+## Connection Pooling
 
+As discussed in the main [readme](../README.md), without connection pooling our GraphQL backend will not scale at the same rate as serverless invocations. With Postgres, we can add a standalone connection pooler like [pgBouncer](https://pgbouncer.github.io/) to accomplish this. 
 
+Deploying pgBouncer requires an EC2 instance. Provision an EC2 instance and setup pgBouncer on it as per the instructions [here](https://www.datachomp.com/archives/getting-started-with-pgbouncer/). In the pgBouncer config, change your `default_pool_size` to an appropriate value like `100`.
 
+Now, change your `POSTGRES_CONNECTION_STRING` in your lambda function to your pgBouncer instance. And, everything should just work!
 
+#### Results
 
+Without pgBouncer:
+
+1. 100 req/sec : 86% error rate
+2. 1000 req/sec: 92% error rate
+
+With pgBouncer:
+
+1. 100 req/sec : 0% error rate
+2. 1000 req/sec: 0% error rate
