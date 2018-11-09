@@ -127,9 +127,25 @@ NOTE: You may have to edit the GraphQL URL in the playground to reflect the righ
 
 As discussed in the main [readme](../README.md), without connection pooling our GraphQL backend will not scale at the same rate as serverless invocations. With Postgres, we can add a standalone connection pooler like [pgBouncer](https://pgbouncer.github.io/) to accomplish this. 
 
-Deploying pgBouncer requires an EC2 instance. Provision an EC2 instance and setup pgBouncer on it as per the instructions [here](https://www.datachomp.com/archives/getting-started-with-pgbouncer/). In the pgBouncer config, change your `default_pool_size` to an appropriate value like `100`.
+Deploying pgBouncer requires an EC2 instance. We can use the CloudFormation template present in this folder: [cloudformation.json](cloudformation.json) to deploy a pgBouncer EC2 instance in few clicks.
 
-Now, change your `POSTGRES_CONNECTION_STRING` in your lambda function to your pgBouncer instance. And, everything should just work!
+#### Deploy pgBouncer
+
+1. Goto CloudFormation in AWS Console and select Create Stack.
+
+2. Upload the file [cloudformation.json](cloudformation.json) as the template.
+
+3. In the next step, fill in your Postgres connection details:
+
+![cloudformation-params](assets/cloudformation-params.png)
+
+4. You do not need any other configuration, so just continue by clicking NEXT and finally click CREATE.
+
+5. After the creation is complete, you will see your new `POSTGRES_CONNECTION_STRING` in the output:
+
+![cloudformation-output](assets/cloudformation-output.png)
+
+Now, change your `POSTGRES_CONNECTION_STRING` in your lambda function to the new value. And, everything should just work!
 
 #### Results
 
