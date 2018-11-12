@@ -149,12 +149,11 @@ Now, change your `POSTGRES_CONNECTION_STRING` in your lambda function to the new
 
 #### Results
 
-Without pgBouncer:
+Using pgBouncer, here are the results for corresponding rate of lambda invocations. The tests were conducted with the `addAuthor` mutation using [jmeter](https://jmeter.apache.org/).
 
-1. 100 req/sec : 86% error rate
-2. 1000 req/sec: 92% error rate
+|  Error Rate -> | Without pgBouncer | With pgBouncer|
+| -------------- | ----------------- | ------------- |
+| 100 req/s      | 86%               | 0%            |
+| 1000 req/s     | 92%               | 4%            |
+| 10000 req/s    | NA                | 3%            |
 
-With pgBouncer:
-
-1. 100 req/sec : 0% error rate
-2. 1000 req/sec: 0% error rate
