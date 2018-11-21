@@ -3,22 +3,39 @@ package main
 import (
 	"net/http"
 	"fmt"
+	"os"
 
 	gh "github.com/graphql-go/handler"
 	g "github.com/graphql-go/graphql"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
+var (
+	POSTGRES_CONNECTION_STRING = func () string {
+		connection_string := "postgres://postgres:password@localhost:6432/postgres?sslmode=disable"
+		if cs := os.Getenv("POSTGRES_CONNECTION_STRING"); cs != "" {
+			connection_string = cs
+		}
+		return connection_string
+	}()
+	DB, DBErr = gorm.Open("postgres", POSTGRES_CONNECTION_STRING)
+    )
+
+
 type Author struct {
-	Id int `json:"id,omitempty"`
+	Id int `json:"id,omitempty" gorm:"primary_key"`
 	Name string `json:"name,omitempty"`
-	Articles []Article `json:"articles,omitempty"`
+	Articles []Article `json:"articles,omitempty" gorm:"foreignkey:AuthorId"`
 }
 
 type Article struct {
-	Id int `json:"id,omitempty"`
+	Id int `json:"id,omitempty" gorm:"primary_key"`
 	Title string `json:"title,omitempty"`
 	Content string `json:"content,omitempty"`
 	AuthorId int `json:"author_id,omitempty"`
+	Author Author `json:"authors,omitempty" gorm:"association_foreignkey:Id"`
 }
 
 var authorType = g.NewObject(g.ObjectConfig{
@@ -60,14 +77,17 @@ var rootQuery = g.NewObject(g.ObjectConfig{
 		"authors": &g.Field{
 			Type: g.NewList(authorType),
 			Resolve: func (p g.ResolveParams) (interface{}, error) {
-				return nil, nil
-
+				authors := make([]Author, 0)
+				DB.Preload("Articles").Find(&authors)
+				return authors, nil
 			},
 		},
 		"articles": &g.Field{
 			Type: g.NewList(articleType),
 			Resolve: func(p g.ResolveParams) (interface{}, error) {
-				return nil, nil
+				articles := make([]Article, 0)
+				DB.Find(&articles)
+				return articles, nil
 			},
 		},
 	},
@@ -85,7 +105,15 @@ var rootMutation = g.NewObject(g.ObjectConfig{
 				},
 			},
 			Resolve: func(p g.ResolveParams) (interface{}, error) {
-				return nil, nil
+				name, _ := p.Args["name"].(string)
+				author := Author{
+					Name: name,
+				}
+				result := DB.Create(&author)
+				if result.Error != nil{
+					return nil, result.Error
+				}
+				return result.Value, nil
 			},
 		},
 		"addArticle": &g.Field{
@@ -102,7 +130,19 @@ var rootMutation = g.NewObject(g.ObjectConfig{
 				},
 			},
 			Resolve: func(p g.ResolveParams) (interface{}, error) {
-				return nil, nil
+				title, _ := p.Args["title"].(string)
+				content, _ := p.Args["content"].(string)
+				author_id, _ := p.Args["author_id"].(int)
+				article := Article{
+					Title: title,
+					Content: content,
+					AuthorId: author_id,
+				}
+				result := DB.Create(&article)
+				if result.Error != nil{
+					return nil, result.Error
+				}
+				return result.Value, nil
 			},
 		},
 
@@ -115,6 +155,11 @@ var schema, _ = g.NewSchema(g.SchemaConfig{
 })
 
 func main() {
+	if DBErr != nil {
+		fmt.Printf("%v", DBErr)
+		return
+	}
+	defer DB.Close()
 	h := gh.New(&gh.Config{
 		Schema: &schema,
 		Pretty: true,
