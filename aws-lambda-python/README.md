@@ -1,5 +1,3 @@
-WIP: The serverless part is a work in progress.
-
 # Python GraphQL Server
 
 This is a GraphQL server with a simple article-author schema. It uses the following:
@@ -39,7 +37,34 @@ This is a GraphQL server with a simple article-author schema. It uses the follow
 3. Run the server
 
     ```bash
-    ./app.py 
+    ./main.py 
     ```
 
 4. Try out graphql queries at `http://localhost:5000/graphql`
+
+## Deployment
+
+Lets deploy this function to a lambda using [Zappa](www.zappa.io)
+
+1. Configure your amazon credentials. [Install amazon CLI](https://docs.aws.amazon.com/cli/latest/userguide/installing.html) and run this command
+
+    ```
+    aws configure
+    ```
+
+
+
+2. Now, from your python virtual environment, initialize your zappa configuration. Run `zappa init`
+
+    ```
+    zappa init
+    ```
+
+3. Set `main.app` as the modular path to your app's function when prompted for it
+
+4. Finally deploy the function by running
+
+    ```
+    zappa deploy dev
+    ```
+
