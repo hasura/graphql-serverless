@@ -1,6 +1,7 @@
-module graphql-serverless.com/example
+module graphql-serverless.com/handler
 
 require (
+	github.com/aws/aws-lambda-go v1.7.0
 	github.com/graphql-go/graphql v0.7.6
 	github.com/graphql-go/handler v0.2.1
 	github.com/jinzhu/gorm v1.9.1
