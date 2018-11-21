@@ -1,4 +1,4 @@
-# nodeJS + AWS Lambda GraphQL Boilerplate
+# NodeJS + AWS Lambda GraphQL Boilerplate
 
 This is a GraphQL backend boilerplate in nodeJS that can be deployed on AWS Lambda.
 
