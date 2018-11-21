@@ -1,10 +1,10 @@
-# NodeJS + AWS Lambda GraphQL Boilerplate
+# Go + AWS Lambda GraphQL Boilerplate
 
-This is a GraphQL backend boilerplate in nodeJS that can be deployed on AWS Lambda.
+This is a GraphQL backend boilerplate in Go that can be deployed on AWS Lambda.
 
 ## Stack
 
-node 8.10
+go 1.11.x
 
 AWS RDS Postgres
 
@@ -12,13 +12,12 @@ AWS Lambda
 
 #### Frameworks/Libraries
 
-Apollo Server (GraphQL framework)
+graphql-go (GraphQL framework)
 
-Sequelize (Postgres ORM)
-
-netlify-lambda (Local dev)
+gorm (Postgres ORM)
 
 ## Schema
+
 
 We consider an Author/Article schema where an author can have many articles.
 
@@ -49,11 +48,11 @@ type Mutation {
 
 ## Development
 
-The sample source code is present in `src/graphql.js`. You can start a development environment by using `netlify-lambda`. Make sure you are in the `aws-lambda-nodejs` folder.
+The sample source code is present in `handler.go`. Make sure you are in the `aws-lambda-go` folder:
 
 ```bash
 $ pwd
-/home/tselvan/graphql-serverless/aws-lambda-nodejs
+/home/tselvan/graphql-serverless/aws-lambda-go
 ```
 
 1) First, let's set the environment variable for connecting to the postgres instance on RDS. You can find this endpoint on your RDS instances page on AWS console:
@@ -68,30 +67,42 @@ $ export POSTGRES_CONNECTION_STRING='postgres://username:password@rds-database-e
 $ psql $POSTGRES_CONNECTION_STRING < migrations.sql
 ```
 
-3) Finally, in the `aws-lambda-nodejs` folder, run `npm install` to install `netlify-lambda`. Then run `netlify-lambda serve`.
+3) Now, you can start a development environment by setting an environment variable before running the code:
 
 ```bash
-$ npm install
+$ export LAMBDA_EXECUTION_ENVIRONMENT=local
+```
 
-$ npx netlify-lambda -c webpack.config.js serve src
+4) Compile and execute the code:
+
+```bash
+$ GOOS=linux go build handler.go
+$ ./handler
 
 Output:
 
-netlify-lambda: Starting server
-Lambda server is listening on 9000
+2018/11/21 16:51:34 graphql server running on port 8080
 ```
 
-This will start a local server on `localhost:9000`. You can hit the graphql service at `localhost:9000/graphql`. This opens a graphql playground where you can query your schema.
+This will start a local server on `localhost:8080`. The graphql API is available at `localhost:8080/graphql`. 
 
-Edit the source code as you wish in the `src` folder and it will auto-reload changes.
+5) Open GraphiQL using [graphQurl](https://github.com/hasura/graphqurl). `graphQurl` gives a local graphiQL environment for any graphql endpoint:
+
+```bash
+$ gq http://localhost:8080/graphql -i
+```
+
+![graphiql-graphqurl](assets/graphiql-graphqurl.png)
+
+Now, you can play with the schema and make any changes in the source code for additional functionalities as you desire.
 
 ## Deployment
 
 Now that you have run the graphql service locally and made any required changes, it's time to deploy your service to AWS Lambda and get an endpoint. The easiest way to do this is through the AWS console.
 
-1) Create a Lambda function by clicking on Create Function on your Lambda console. Choose the `NodeJS 8.10` runtime and `lambda_basic_execution` role.
+1) Create a Lambda function by clicking on Create Function on your Lambda console. Choose the `Go 1.x` runtime and `lambda_basic_execution` role.
 
-![create-lambda](assets/create-lambda.png)
+![create-lambda-go](assets/create-lambda-go.png)
 
 2) In the next page (or Lambda instance page), select API Gateway as the trigger.
 
@@ -107,21 +118,21 @@ Save your changes. You will receive a HTTPS endpoint for your lambda.
 
 If you go to the endpoint, you will receive a "Hello from Lambda!" message. This is because we haven't uploaded any code yet!
 
-4) Upload code: You can use `netlify-lambda` to create a buildpack for your lambda.
+4) Upload code: You need to upload the zip of the binary in Lambda:
 
 ```bash
-$ npx netlify-lambda -c webpack.config.js build src
+$ zip handler.zip ./handler
 ```
-
-This will create a `graphql.js` file in your `build/` folder. You can either copy the contents of this file directly or zip it and upload it on the Lambda console.
 
 Also, make sure to add the `POSTGRES_CONNECTION_STRING` environment variable.
 
-![upload-code](assets/upload-code.png)
+![upload-code-go](assets/upload-code-go.png)
 
-And that's it. Hit save and visit the endpoint again. You will see the graphql playground again.
+And that's it. Hit save and visit the endpoint again. You will see a graphQL error message since there are no query parameters but it means it's workings. You can use `graphQurl` again to get graphiQL:
 
-NOTE: You may have to edit the GraphQL URL in the playground to reflect the right endpoint ( same as the URL in the browser ).
+```bash
+$ gq https://123ads9.execute-api.us-east-1.amazonaws.com/default/graphql-serverless-go-example -i
+```
 
 ## Connection Pooling
 
@@ -156,4 +167,5 @@ Using pgBouncer, here are the results for corresponding rate of lambda invocatio
 | 100 req/s      | 86%               | 0%            |
 | 1000 req/s     | 92%               | 4%            |
 | 10000 req/s    | NA                | 3%            |
+
 

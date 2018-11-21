@@ -16,4 +16,6 @@ The boilerplates in this repo provide sample source code to solve the above prob
 
 Get started with the following languages and serverless platforms:
 
-[nodeJS + AWS Lambda](https://github.com/hasura/graphql-serverless/tree/master/aws-lambda-nodejs)
+[NodeJS + AWS Lambda](https://github.com/hasura/graphql-serverless/tree/master/aws-lambda-nodejs)
+
+[Go + AWS Lambda](https://github.com/hasura/graphql-serverless/tree/master/aws-lambda-go)
