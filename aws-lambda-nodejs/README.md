@@ -107,13 +107,15 @@ Save your changes. You will receive a HTTPS endpoint for your lambda.
 
 If you go to the endpoint, you will receive a "Hello from Lambda!" message. This is because we haven't uploaded any code yet!
 
-4) Upload code: You can use `netlify-lambda` to create a buildpack for your lambda.
+4) Upload code: (Optional) You can use `netlify-lambda` to create a buildpack for your lambda.
 
 ```bash
 $ npx netlify-lambda -c webpack.config.js build src
 ```
 
 This will create a `graphql.js` file in your `build/` folder. You can either copy the contents of this file directly or zip it and upload it on the Lambda console.
+
+If you are not using the buildpack, you can just zip the entire folder and upload it on the Lambda console.
 
 Also, make sure to add the `POSTGRES_CONNECTION_STRING` environment variable.
 
