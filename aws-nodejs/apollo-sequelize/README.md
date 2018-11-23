@@ -116,7 +116,7 @@ NOTE: You may have to edit the GraphQL URL in the playground to reflect the righ
 
 ## Connection Pooling
 
-As discussed in the main [readme](../README.md), without connection pooling our GraphQL backend will not scale at the same rate as serverless invocations. With Postgres, we can add a standalone connection pooler like [pgBouncer](https://pgbouncer.github.io/) to accomplish this. 
+As discussed in the main [readme](../../README.md), without connection pooling our GraphQL backend will not scale at the same rate as serverless invocations. With Postgres, we can add a standalone connection pooler like [pgBouncer](https://pgbouncer.github.io/) to accomplish this. 
 
 Deploying pgBouncer requires an EC2 instance. We can use the CloudFormation template present in this folder: [cloudformation.json](../cloudformation.json) to deploy a pgBouncer EC2 instance in few clicks.
 
