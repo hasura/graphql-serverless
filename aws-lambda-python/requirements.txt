@@ -1,5 +1,5 @@
 graphene[sqlalchemy]
-SQLAlchemy==1.0.11
+sqlalchemy
 flask
 flask_graphql
 psycopg2
