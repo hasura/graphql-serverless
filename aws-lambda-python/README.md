@@ -91,7 +91,7 @@ type Mutation {
 Now that you have run the graphql service locally and made any required changes, it's time to deploy your service to AWS Lambda and get an endpoint. 
 
 Lets deploy this function to a lambda using [Zappa](www.zappa.io)
-
+main
 1. Configure your amazon credentials. [Install amazon CLI](https://docs.aws.amazon.com/cli/latest/userguide/installing.html) and run this command
 
     ```
@@ -112,8 +112,8 @@ Lets deploy this function to a lambda using [Zappa](www.zappa.io)
 
     ```json
     {
-        "app_function": 'main.app',
-        "s3_bucket": '<something>',
+        "app_function": "main.app",
+        "s3_bucket": "<something>",
         ...
         "environment_variables": {
             "POSTGRES_CONNECTION_STRING": "postgres://username:password@hostname:port/database"
