@@ -40,7 +40,7 @@ type Mutation {
 
 ## Development
 
-The sample source code is present in `handler.go`. Make sure you are in the `aws-lambda-go` folder:
+The sample source code is present in `handler.go`. Make sure you are in the `aws-go/graphqlgo-gorm` folder:
 
 ```bash
 $ pwd

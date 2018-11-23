@@ -1,4 +1,4 @@
-# NodeJS + AWS Lambda GraphQL Boilerplate
+# NodeJS + AWS Lambda + Apollo Server + Sequelize
 
 This is a GraphQL backend boilerplate in nodeJS that can be deployed on AWS Lambda.
 
@@ -16,44 +16,34 @@ Apollo Server (GraphQL framework)
 
 Sequelize (Postgres ORM)
 
-netlify-lambda (Local dev)
-
 ## Schema
 
-We consider an Author/Article schema where an author can have many articles.
+We consider a bank account schema where a user can transfer money to another user. This will involve writing a `transfer` resolver which does complex business logic in a transaction.
 
 ```
-type Author {
+type User {
   id:       Int
   name:     String
-  articles: [Article]
-}
-
-type Article {
-  id:        Int
-  title:     String
-  content:   String
-  author_id: Int
+  balance:  Int
 }
 
 type Query {
-  authors:  [Author]
-  articles: [Article]
+  users:  [User]
 }
 
 type Mutation {
-  addAuthor(name: String): Author
-  addArticle(title: String, content: String, author_id: Int): Article
+  addUser(name: String, balance: Int): User
+  transfer(userIdFrom: Int, userIdTo: Int, amount: Int): User
 }
 ```
 
 ## Development
 
-The sample source code is present in `src/graphql.js`. You can start a development environment by using `netlify-lambda`. Make sure you are in the `aws-lambda-nodejs` folder.
+The sample source code is present in `graphql.js`. Make sure you are in the `aws-nodejs/apollo-sequelize` folder:
 
 ```bash
 $ pwd
-/home/tselvan/graphql-serverless/aws-lambda-nodejs
+/home/tselvan/graphql-serverless/aws-nodejs/apollo-sequelize
 ```
 
 1) First, let's set the environment variable for connecting to the postgres instance on RDS. You can find this endpoint on your RDS instances page on AWS console:
@@ -68,22 +58,25 @@ $ export POSTGRES_CONNECTION_STRING='postgres://username:password@rds-database-e
 $ psql $POSTGRES_CONNECTION_STRING < migrations.sql
 ```
 
-3) Finally, in the `aws-lambda-nodejs` folder, run `npm install` to install `netlify-lambda`. Then run `netlify-lambda serve`.
+3) Now, you can start a development environment by setting an environment variable before running the code:
 
 ```bash
-$ npm install
+$ export LAMBDA_EXECUTION_ENVIRONMENT=local
+```
 
-$ npx netlify-lambda -c webpack.config.js serve src
+4) Now, you can run the code:
+
+```bash
+$ node graphql.js
 
 Output:
 
-netlify-lambda: Starting server
-Lambda server is listening on 9000
+Server ready at http://localhost:4000/
 ```
 
-This will start a local server on `localhost:9000`. You can hit the graphql service at `localhost:9000/graphql`. This opens a graphql playground where you can query your schema.
+This will start a local server on `localhost:4000`. You can hit the graphql service at `localhost:4000`. This opens a graphql playground where you can query your schema.
 
-Edit the source code as you wish in the `src` folder and it will auto-reload changes.
+Now, you can play with the schema and make any changes in the source code for additional functionalities as you desire.
 
 ## Deployment
 
@@ -91,35 +84,31 @@ Now that you have run the graphql service locally and made any required changes,
 
 1) Create a Lambda function by clicking on Create Function on your Lambda console. Choose the `NodeJS 8.10` runtime and `lambda_basic_execution` role.
 
-![create-lambda](assets/create-lambda.png)
+![create-lambda](../assets/create-lambda.png)
 
 2) In the next page (or Lambda instance page), select API Gateway as the trigger.
 
-![create-api-gateway](assets/create-api-gateway.png)
+![create-api-gateway](../assets/create-api-gateway.png)
 
 3) Configure the API Gateway as you wish. The simplest configuration is shown below.
 
-![configure-api-gateway](assets/configure-api-gateway.png)
+![configure-api-gateway](../assets/configure-api-gateway.png)
 
 Save your changes. You will receive a HTTPS endpoint for your lambda.
 
-![output-api-gateway](assets/output-api-gateway.png)
+![output-api-gateway](../assets/output-api-gateway.png)
 
 If you go to the endpoint, you will receive a "Hello from Lambda!" message. This is because we haven't uploaded any code yet!
 
-4) Upload code: (Optional) You can use `netlify-lambda` to create a buildpack for your lambda.
+4) Zip and upload code: 
 
 ```bash
-$ npx netlify-lambda -c webpack.config.js build src
+$ zip graphql.zip apollo-sequelize/*
 ```
-
-This will create a `graphql.js` file in your `build/` folder. You can either copy the contents of this file directly or zip it and upload it on the Lambda console.
-
-If you are not using the buildpack, you can just zip the entire folder and upload it on the Lambda console.
 
 Also, make sure to add the `POSTGRES_CONNECTION_STRING` environment variable.
 
-![upload-code](assets/upload-code.png)
+![upload-code](../assets/upload-code.png)
 
 And that's it. Hit save and visit the endpoint again. You will see the graphql playground again.
 
@@ -129,23 +118,23 @@ NOTE: You may have to edit the GraphQL URL in the playground to reflect the righ
 
 As discussed in the main [readme](../README.md), without connection pooling our GraphQL backend will not scale at the same rate as serverless invocations. With Postgres, we can add a standalone connection pooler like [pgBouncer](https://pgbouncer.github.io/) to accomplish this. 
 
-Deploying pgBouncer requires an EC2 instance. We can use the CloudFormation template present in this folder: [cloudformation.json](cloudformation.json) to deploy a pgBouncer EC2 instance in few clicks.
+Deploying pgBouncer requires an EC2 instance. We can use the CloudFormation template present in this folder: [cloudformation.json](../cloudformation.json) to deploy a pgBouncer EC2 instance in few clicks.
 
 #### Deploy pgBouncer
 
 1. Goto CloudFormation in AWS Console and select Create Stack.
 
-2. Upload the file [cloudformation.json](cloudformation.json) as the template.
+2. Upload the file [cloudformation.json](../cloudformation.json) as the template.
 
 3. In the next step, fill in your Postgres connection details:
 
-![cloudformation-params](assets/cloudformation-params.png)
+![cloudformation-params](../assets/cloudformation-params.png)
 
 4. You do not need any other configuration, so just continue by clicking NEXT and finally click CREATE.
 
 5. After the creation is complete, you will see your new `POSTGRES_CONNECTION_STRING` in the output:
 
-![cloudformation-output](assets/cloudformation-output.png)
+![cloudformation-output](../assets/cloudformation-output.png)
 
 Now, change your `POSTGRES_CONNECTION_STRING` in your lambda function to the new value. And, everything should just work!
 
