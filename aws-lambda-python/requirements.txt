@@ -1,0 +1,7 @@
+graphene[sqlalchemy]
+sqlalchemy
+flask
+flask_graphql
+psycopg2
+zappa
+
