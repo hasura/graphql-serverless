@@ -1,4 +1,4 @@
-# Go + AWS Lambda GraphQL Boilerplate
+# Go + AWS Lambda + GraphQL-Go + Gorm Boilerplate
 
 This is a GraphQL backend boilerplate in Go that can be deployed on AWS Lambda.
 
@@ -128,7 +128,7 @@ $ gq https://123ads9.execute-api.us-east-1.amazonaws.com/default/graphql-serverl
 
 ## Connection Pooling
 
-As discussed in the main [readme](../README.md), without connection pooling our GraphQL backend will not scale at the same rate as serverless invocations. With Postgres, we can add a standalone connection pooler like [pgBouncer](https://pgbouncer.github.io/) to accomplish this. 
+As discussed in the main [readme](../../README.md), without connection pooling our GraphQL backend will not scale at the same rate as serverless invocations. With Postgres, we can add a standalone connection pooler like [pgBouncer](https://pgbouncer.github.io/) to accomplish this. 
 
 Deploying pgBouncer requires an EC2 instance. We can use the CloudFormation template present in this folder: [cloudformation.json](../cloudformation.json) to deploy a pgBouncer EC2 instance in few clicks.
 
