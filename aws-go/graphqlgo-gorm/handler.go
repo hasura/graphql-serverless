@@ -6,6 +6,7 @@ import (
 	"log"
 	"encoding/json"
 	"io/ioutil"
+	"errors"
 
 	g "github.com/graphql-go/graphql"
 
@@ -28,48 +29,22 @@ var (
     )
 
 
-type Author struct {
+type User struct {
 	Id int `json:"id,omitempty" gorm:"primary_key"`
 	Name string `json:"name,omitempty"`
-	Articles []Article `json:"articles,omitempty" gorm:"foreignkey:AuthorId"`
+	Balance int `json:"balance,omitempty"`
 }
 
-type Article struct {
-	Id int `json:"id,omitempty" gorm:"primary_key"`
-	Title string `json:"title,omitempty"`
-	Content string `json:"content,omitempty"`
-	AuthorId int `json:"author_id,omitempty"`
-	Author Author `json:"authors,omitempty" gorm:"association_foreignkey:Id"`
-}
-
-var authorType = g.NewObject(g.ObjectConfig{
-	Name: "Author",
+var userType = g.NewObject(g.ObjectConfig{
+	Name: "User",
 	Fields: g.Fields{
 		"id": &g.Field{
-			Type: g.String,
+			Type: g.Int,
 		},
 		"name": &g.Field{
 			Type: g.String,
 		},
-		"articles": &g.Field{
-			Type: g.NewList(articleType),
-		},
-	},
-})
-
-var articleType = g.NewObject(g.ObjectConfig{
-	Name: "Article",
-	Fields: g.Fields{
-		"id": &g.Field{
-			Type: g.String,
-		},
-		"title": &g.Field{
-			Type: g.String,
-		},
-		"content": &g.Field{
-			Type: g.String,
-		},
-		"author_id": &g.Field{
+		"balance": &g.Field{
 			Type: g.Int,
 		},
 	},
@@ -78,20 +53,12 @@ var articleType = g.NewObject(g.ObjectConfig{
 var rootQuery = g.NewObject(g.ObjectConfig{
 	Name: "Query",
 	Fields: g.Fields{
-		"authors": &g.Field{
-			Type: g.NewList(authorType),
+		"users": &g.Field{
+			Type: g.NewList(userType),
 			Resolve: func (p g.ResolveParams) (interface{}, error) {
-				authors := make([]Author, 0)
-				DB.Preload("Articles").Find(&authors)
-				return authors, nil
-			},
-		},
-		"articles": &g.Field{
-			Type: g.NewList(articleType),
-			Resolve: func(p g.ResolveParams) (interface{}, error) {
-				articles := make([]Article, 0)
-				DB.Find(&articles)
-				return articles, nil
+				users:= make([]User, 0)
+				DB.Find(&users)
+				return users, nil
 			},
 		},
 	},
@@ -101,52 +68,78 @@ var rootQuery = g.NewObject(g.ObjectConfig{
 var rootMutation = g.NewObject(g.ObjectConfig{
 	Name: "Mutation",
 	Fields: g.Fields{
-		"addAuthor": &g.Field{
-			Type: authorType,
+		"addUser": &g.Field{
+			Type: userType,
 			Args: g.FieldConfigArgument{
 				"name": &g.ArgumentConfig{
 					Type: g.NewNonNull(g.String),
 				},
+				"balance": &g.ArgumentConfig{
+					Type: g.NewNonNull(g.Int),
+				},
 			},
 			Resolve: func(p g.ResolveParams) (interface{}, error) {
 				name, _ := p.Args["name"].(string)
-				author := Author{
+				balance, _ := p.Args["balance"].(int)
+				user := User{
 					Name: name,
+					Balance: balance,
 				}
-				result := DB.Create(&author)
+				result := DB.Create(&user)
 				if result.Error != nil{
 					return nil, result.Error
 				}
 				return result.Value, nil
 			},
 		},
-		"addArticle": &g.Field{
-			Type: articleType,
+		"transfer": &g.Field{
+			Type: userType,
 			Args: g.FieldConfigArgument{
-				"title": &g.ArgumentConfig{
-					Type: g.NewNonNull(g.String),
+				"userIdFrom": &g.ArgumentConfig{
+					Type: g.NewNonNull(g.Int),
 				},
-				"content": &g.ArgumentConfig{
-					Type: g.NewNonNull(g.String),
+				"userIdTo": &g.ArgumentConfig{
+					Type: g.NewNonNull(g.Int),
 				},
-				"author_id": &g.ArgumentConfig{
+				"amount": &g.ArgumentConfig{
 					Type: g.NewNonNull(g.Int),
 				},
 			},
 			Resolve: func(p g.ResolveParams) (interface{}, error) {
-				title, _ := p.Args["title"].(string)
-				content, _ := p.Args["content"].(string)
-				author_id, _ := p.Args["author_id"].(int)
-				article := Article{
-					Title: title,
-					Content: content,
-					AuthorId: author_id,
+				userIdFrom, _ := p.Args["userIdFrom"].(int)
+				userIdTo, _ := p.Args["userIdTo"].(int)
+				amount, _ := p.Args["amount"].(int)
+
+				if userIdFrom == userIdTo {
+					return nil, errors.New("can't transfer on same account")
 				}
-				result := DB.Create(&article)
+
+				tx := DB.Begin()
+				var userFrom User
+				result := tx.Where("id= ?", userIdFrom).First(&userFrom)
 				if result.Error != nil{
 					return nil, result.Error
 				}
-				return result.Value, nil
+				var userTo User
+				result = tx.Where("id= ?", userIdTo).First(&userTo)
+				if result.Error != nil{
+					return nil, result.Error
+				}
+
+				if (userFrom.Balance - amount) < 0 {
+					return nil, errors.New("balance is too low")
+
+				}
+
+				userFrom.Balance = userFrom.Balance - amount
+				resultFrom := tx.Save(&userFrom)
+
+				userTo.Balance = userTo.Balance + amount
+				tx.Save(&userTo)
+
+				tx.Commit()
+
+				return resultFrom.Value, nil
 			},
 		},
 
@@ -224,7 +217,6 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 func main() {
 	if DBErr != nil {
 		log.Printf("%v", DBErr)
-		return
 	}
 	defer DB.Close()
 	// run a graphql server in  local development mode
