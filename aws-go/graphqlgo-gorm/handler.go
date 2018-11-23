@@ -57,8 +57,11 @@ var rootQuery = g.NewObject(g.ObjectConfig{
 			Type: g.NewList(userType),
 			Resolve: func (p g.ResolveParams) (interface{}, error) {
 				users:= make([]User, 0)
-				DB.Find(&users)
-				return users, nil
+				result := DB.Find(&users)
+				if result.Error != nil{
+					return nil, result.Error
+				}
+				return result.Value, nil
 			},
 		},
 	},
