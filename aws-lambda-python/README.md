@@ -1,19 +1,59 @@
-# Python GraphQL Server
+# Python + AWS Lambda GraphQL Boilerplate
 
-This is a GraphQL server with a simple article-author schema. It uses the following:
+This is a GraphQL backend boilerplate in Python that can be deployed on AWS Lambda.
 
-1. Flask
-2. Graphene
-3. SQL Alcheme
-4. Postgres
+## Stack
 
-## Local development
+Python 2.7
+
+AWS RDS Postgres
+
+AWS Lambda
+
+#### Frameworks/Libraries
+
+Graphene
+
+SQL Alchemy (Postgres ORM)
+
+zappa (flask-serverless bundling)
+
+## Schema
+
+We consider an Author/Article schema where an author can have many articles.
+
+```
+type Author {
+  id:       Int
+  name:     String
+  articles: [Article]
+}
+
+type Article {
+  id:        Int
+  title:     String
+  content:   String
+  author_id: Int
+}
+
+type Query {
+  authors:  [Author]
+  articles: [Article]
+}
+
+type Mutation {
+  addAuthor(name: String): Author
+  addArticle(title: String, content: String, author_id: Int): Article
+}
+```
+
+## Development
 
 1. Clone the repo
 
     ```bash
     git clone git@github.com:hasura/graphql-serverless
-    cd graphql-serverless
+    cd graphql-serverless/aws-lambda-python
     ```
 
 1. Set up your development environment
@@ -44,6 +84,8 @@ This is a GraphQL server with a simple article-author schema. It uses the follow
 
 ## Deployment
 
+Now that you have run the graphql service locally and made any required changes, it's time to deploy your service to AWS Lambda and get an endpoint. 
+
 Lets deploy this function to a lambda using [Zappa](www.zappa.io)
 
 1. Configure your amazon credentials. [Install amazon CLI](https://docs.aws.amazon.com/cli/latest/userguide/installing.html) and run this command
@@ -60,11 +102,60 @@ Lets deploy this function to a lambda using [Zappa](www.zappa.io)
     zappa init
     ```
 
-3. Set `main.app` as the modular path to your app's function when prompted for it
+3. Set `main.app` as the modular path to your app's function when prompted for it. Now a `zappa_settings.json` must have been generated.
+
+4. Set your POSTGRES_CONNECTION_STRING as an environment variable in `zappa_settings.json`
+
+    ```json
+    {
+        "app_function": 'main.app',
+        "s3_bucket": '<something>',
+        ...
+        "environment_variables": {
+            "POSTGRES_CONNECTION_STRING": "postgres://username:password@hostname:port/database"
+        }
+    }
+    ```
 
 4. Finally deploy the function by running
 
     ```
     zappa deploy dev
     ```
+
+
+
+## Connection Pooling
+
+As discussed in the main [readme](../README.md), without connection pooling our GraphQL backend will not scale at the same rate as serverless invocations. With Postgres, we can add a standalone connection pooler like [pgBouncer](https://pgbouncer.github.io/) to accomplish this. 
+
+Deploying pgBouncer requires an EC2 instance. We can use the CloudFormation template present in this folder: [cloudformation.json](cloudformation.json) to deploy a pgBouncer EC2 instance in few clicks.
+
+#### Deploy pgBouncer
+
+1. Goto CloudFormation in AWS Console and select Create Stack.
+
+2. Upload the file [cloudformation.json](cloudformation.json) as the template.
+
+3. In the next step, fill in your Postgres connection details:
+
+![cloudformation-params](assets/cloudformation-params.png)
+
+4. You do not need any other configuration, so just continue by clicking NEXT and finally click CREATE.
+
+5. After the creation is complete, you will see your new `POSTGRES_CONNECTION_STRING` in the output:
+
+![cloudformation-output](assets/cloudformation-output.png)
+
+Now, change your `POSTGRES_CONNECTION_STRING` in your `zappa_settings.json` to the new value. Update the environment variable by running `zappa update` and, everything should just work!
+
+#### Results
+
+Using pgBouncer, here are the results for corresponding rate of lambda invocations. The tests were conducted with the `addAuthor` mutation using [jmeter](https://jmeter.apache.org/).
+
+|  Error Rate -> | Without pgBouncer | With pgBouncer|
+| -------------- | ----------------- | ------------- |
+| 100 req/s      | 86%               | 0%            |
+| 1000 req/s     | 92%               | 4%            |
+| 10000 req/s    | NA                | 3%            |
 
