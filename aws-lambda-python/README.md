@@ -16,7 +16,7 @@ Graphene
 
 SQL Alchemy (Postgres ORM)
 
-zappa (flask-serverless bundling)
+Zappa (flask-serverless bundling)
 
 ## Schema
 
@@ -68,19 +68,23 @@ type Mutation {
 
     ```bash
     # your postgres connection string
-    export POSTGRES_CONNECTION_STRING
-
-    # should the database be initialized (0 or 1)
-    export DATABASE_INIT=1
+    export POSTGRES_CONNECTION_STRING='postgres://username:password@rds-database-endpoint.us-east-1.rds.amazonaws.com:5432/mydb' 
     ```
 
-3. Run the server
+
+3. Next, lets create the tables required for our schema. The SQL commands are in `migrations.sql` file.
+
+    ```bash
+    $ psql $POSTGRES_CONNECTION_STRING < migrations.sql
+    ```
+
+4. Run the server
 
     ```bash
     ./main.py 
     ```
 
-4. Try out graphql queries at `http://localhost:5000/graphql`
+5. Try out graphql queries at `http://localhost:5000/graphql`
 
 ## Deployment
 
@@ -104,7 +108,7 @@ Lets deploy this function to a lambda using [Zappa](www.zappa.io)
 
 3. Set `main.app` as the modular path to your app's function when prompted for it. Now a `zappa_settings.json` must have been generated.
 
-4. Set your POSTGRES_CONNECTION_STRING as an environment variable in `zappa_settings.json`
+4. Set your POSTGRES_CONNECTION_STRING as an environment variable in `zappa_settings.json` (you will have to run the `migrations.sql` if you haven't )
 
     ```json
     {
@@ -117,7 +121,7 @@ Lets deploy this function to a lambda using [Zappa](www.zappa.io)
     }
     ```
 
-4. Finally deploy the function by running
+5. Finally deploy the function by running
 
     ```
     zappa deploy dev
