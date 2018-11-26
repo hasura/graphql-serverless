@@ -1,4 +1,4 @@
-# Python + AWS Lambda GraphQL Boilerplate
+# Python + AWS Lambda + Graphene + SQLAlchemy
 
 This is a GraphQL backend boilerplate in Python that can be deployed on AWS Lambda.
 
@@ -69,10 +69,10 @@ type Mutation {
     $ psql $POSTGRES_CONNECTION_STRING < migrations.sql
     ```
 
-4. Run the server with an environment variable `LOCAL_DEVELOPMENT=1`
+4. Run the server with an environment variable `LAMBDA_LOCAL_DEVELOPMENT=1`
 
     ```bash
-    LOCAL_DEVELOPMENT=1 ./main.py 
+    LAMBDA_LOCAL_DEVELOPMENT=1 ./main.py 
     ```
 
 5. Try out graphql queries at `http://localhost:5000/graphql`
@@ -117,7 +117,7 @@ Deploying pgBouncer requires an EC2 instance. We can use the CloudFormation temp
 
 1. Goto CloudFormation in AWS Console and select Create Stack.
 
-2. Upload the file [cloudformation.json](cloudformation.json) as the template.
+2. Upload the file [../cloudformation.json](../cloudformation.json) as the template.
 
 3. In the next step, fill in your Postgres connection details:
 

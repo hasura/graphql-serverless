@@ -54,14 +54,16 @@ class User(SQLAlchemyObjectType):
     model = UserModel
 
 class Query(graphene.ObjectType):
+
+  hello = graphene.String()
+  def resolve_hello(self, info):
+    return "Hello World!"
+
   users = graphene.List(User)
   def resolve_users(self, info):
     query = User.get_query(info)
     return query.all()
 
-  hello = graphene.String()
-  def resolve_hello(self, info):
-    return "Hello World!"
 ################################
 
 # Mutation #####################
@@ -96,7 +98,7 @@ class Transfer(graphene.Mutation):
       raise GraphQLError('No user exists with id: ' + str(userIdTo))
 
     if (userFrom.balance < amount):
-      raise GraphQLError('Traferer does not have enough amount')
+      raise GraphQLError('Transferor does not have enough amount')
 
     try:
       userFrom.balance -= amount
@@ -127,7 +129,8 @@ def shutdown_session(exception=None):
 #############################################################################
 
 ################################## EXECUTION ##################################
-if (os.environ.get('LOCAL_DEVELOPMENT')):
+
+if os.environ.get('LAMBDA_LOCAL_DEVELOPMENT') !== '1':
   if __name__ == '__main__':
     if os.environ.get('DATABASE_INIT') == '1':
       init_db()

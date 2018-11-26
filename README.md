@@ -21,5 +21,5 @@ Get started with the following languages and serverless platforms:
 
 [NodeJS + AWS Lambda](https://github.com/hasura/graphql-serverless/tree/master/aws-nodejs)
 
-[Python + AWS Lambda](https://github.com/hasura/graphql-serverless/tree/master/aws-lambda-python)
+[Python + AWS Lambda](https://github.com/hasura/graphql-serverless/tree/master/aws-python/graphene-sqlalchmey)
 
