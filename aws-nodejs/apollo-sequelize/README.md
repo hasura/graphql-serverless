@@ -103,7 +103,7 @@ If you go to the endpoint, you will receive a "Hello from Lambda!" message. This
 4) Zip and upload code: 
 
 ```bash
-$ zip graphql.zip apollo-sequelize/*
+$ zip -r graphql.zip *
 ```
 
 Also, make sure to add the `POSTGRES_CONNECTION_STRING` environment variable.
