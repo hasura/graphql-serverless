@@ -121,13 +121,13 @@ Deploying pgBouncer requires an EC2 instance. We can use the CloudFormation temp
 
 3. In the next step, fill in your Postgres connection details:
 
-![cloudformation-params](assets/cloudformation-params.png)
+![cloudformation-params](../assets/cloudformation-params.png)
 
 4. You do not need any other configuration, so just continue by clicking NEXT and finally click CREATE.
 
 5. After the creation is complete, you will see your new `POSTGRES_CONNECTION_STRING` in the output:
 
-![cloudformation-output](assets/cloudformation-output.png)
+![cloudformation-output](../assets/cloudformation-output.png)
 
 Now, change your `POSTGRES_CONNECTION_STRING` in your `zappa_settings.json` to the new value. Update the environment variable by running `zappa update` and, everything should just work!
 
