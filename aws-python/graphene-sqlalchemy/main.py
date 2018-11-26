@@ -130,7 +130,7 @@ def shutdown_session(exception=None):
 
 ################################## EXECUTION ##################################
 
-if os.environ.get('LAMBDA_LOCAL_DEVELOPMENT') !== '1':
+if os.environ.get('LAMBDA_LOCAL_DEVELOPMENT') == '1':
   if __name__ == '__main__':
     if os.environ.get('DATABASE_INIT') == '1':
       init_db()
