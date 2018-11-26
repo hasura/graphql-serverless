@@ -29,6 +29,7 @@ type User {
 
 type Query {
   users:  [User]
+  hello: String
 }
 
 type Mutation {

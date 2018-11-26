@@ -58,6 +58,10 @@ class Query(graphene.ObjectType):
   def resolve_users(self, info):
     query = User.get_query(info)
     return query.all()
+
+  hello = graphene.String()
+  def resolve_hello(self, info):
+    return "Hello World!"
 ################################
 
 # Mutation #####################
