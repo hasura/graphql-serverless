@@ -1,3 +1,4 @@
 env
 *.pyc
 zappa_settings.json
+_package*

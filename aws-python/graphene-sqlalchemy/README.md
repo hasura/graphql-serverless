@@ -1,4 +1,4 @@
-# Python + AWS Lambda GraphQL Boilerplate
+# Python + AWS Lambda + Graphene + SQLAlchemy
 
 This is a GraphQL backend boilerplate in Python that can be deployed on AWS Lambda.
 
@@ -16,34 +16,25 @@ Graphene
 
 SQL Alchemy (Postgres ORM)
 
-Zappa (flask-serverless bundling)
-
 ## Schema
 
 We consider an Author/Article schema where an author can have many articles.
 
 ```
-type Author {
+type User {
   id:       Int
   name:     String
-  articles: [Article]
-}
-
-type Article {
-  id:        Int
-  title:     String
-  content:   String
-  author_id: Int
+  balance:  Int
 }
 
 type Query {
-  authors:  [Author]
-  articles: [Article]
+  users:  [User]
+  hello: String
 }
 
 type Mutation {
-  addAuthor(name: String): Author
-  addArticle(title: String, content: String, author_id: Int): Article
+  addUser(name: String, balance: Int): User
+  transfer(userIdFrom: Int, userIdTo: Int, amount: Int): User
 }
 ```
 
@@ -53,7 +44,7 @@ type Mutation {
 
     ```bash
     git clone git@github.com:hasura/graphql-serverless
-    cd graphql-serverless/aws-lambda-python
+    cd graphql-serverless/aws-python/graphene-sqlalchemy
     ```
 
 1. Set up your development environment
@@ -78,56 +69,43 @@ type Mutation {
     $ psql $POSTGRES_CONNECTION_STRING < migrations.sql
     ```
 
-4. Run the server
+4. Run the server with an environment variable `LAMBDA_LOCAL_DEVELOPMENT=1`
 
     ```bash
-    ./main.py 
+    LAMBDA_LOCAL_DEVELOPMENT=1 ./main.py 
     ```
 
 5. Try out graphql queries at `http://localhost:5000/graphql`
 
 ## Deployment
 
-Now that you have run the graphql service locally and made any required changes, it's time to deploy your service to AWS Lambda and get an endpoint. 
+Now that you have run the graphql service locally and made any required changes, it's time to deploy your service to AWS Lambda and get an endpoint. The easiest way to do this is through the AWS console.
 
-Lets deploy this function to a lambda using [Zappa](www.zappa.io)
-main
-1. Configure your amazon credentials. [Install amazon CLI](https://docs.aws.amazon.com/cli/latest/userguide/installing.html) and run this command
+1) Create a Lambda function by clicking on Create Function on your [Lambda console](https://console.aws.amazon.com/lambda/home). Choose the `Python 2.7` runtime.
 
-    ```
-    aws configure
-    ```
+2) In the next page (or Lambda instance page), select API Gateway as the trigger.
 
+   ![create-api-gateway](../assets/create-api-gateway.png)
 
+3) Configure the API Gateway as you wish. The simplest configuration is shown below.
 
-2. Now, from your python virtual environment, initialize your zappa configuration. Run `zappa init`
+   ![configure-api-gateway](../assets/configure-api-gateway.png)
 
-    ```
-    zappa init
-    ```
+Save your changes. You will receive a HTTPS endpoint for your lambda.
 
-3. Set `main.app` as the modular path to your app's function when prompted for it. Now a `zappa_settings.json` must have been generated.
+   ![output-api-gateway](../assets/output-api-gateway.png)
 
-4. Set your POSTGRES_CONNECTION_STRING as an environment variable in `zappa_settings.json` (you will have to run the `migrations.sql` if you haven't )
+If you go to the endpoint, you will receive a "Hello from Lambda!" message. This is because we haven't uploaded any code yet!
 
-    ```json
-    {
-        "app_function": "main.app",
-        "s3_bucket": "<something>",
-        ...
-        "environment_variables": {
-            "POSTGRES_CONNECTION_STRING": "postgres://username:password@hostname:port/database"
-        }
-    }
-    ```
+4) Zip and upload code (follow the instructions [here](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html#python-package-venv)). You can also run the shell script to genereate a zipped package (`_package.zip`)
 
-5. Finally deploy the function by running
+   ```bash
+   $ ./package.sh
+   ```
 
-    ```
-    zappa deploy dev
-    ```
+5. Make sure to add the `POSTGRES_CONNECTION_STRING` environment variable.
 
-
+6. Finally upload the code while setting the handler as `main.lambda_handler`.
 
 ## Connection Pooling
 
@@ -139,17 +117,17 @@ Deploying pgBouncer requires an EC2 instance. We can use the CloudFormation temp
 
 1. Goto CloudFormation in AWS Console and select Create Stack.
 
-2. Upload the file [cloudformation.json](cloudformation.json) as the template.
+2. Upload the file [../cloudformation.json](../cloudformation.json) as the template.
 
 3. In the next step, fill in your Postgres connection details:
 
-![cloudformation-params](assets/cloudformation-params.png)
+![cloudformation-params](../assets/cloudformation-params.png)
 
 4. You do not need any other configuration, so just continue by clicking NEXT and finally click CREATE.
 
 5. After the creation is complete, you will see your new `POSTGRES_CONNECTION_STRING` in the output:
 
-![cloudformation-output](assets/cloudformation-output.png)
+![cloudformation-output](../assets/cloudformation-output.png)
 
 Now, change your `POSTGRES_CONNECTION_STRING` in your `zappa_settings.json` to the new value. Update the environment variable by running `zappa update` and, everything should just work!
 
