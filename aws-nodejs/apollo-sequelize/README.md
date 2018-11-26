@@ -28,6 +28,7 @@ type User {
 }
 
 type Query {
+  hello:  String
   users:  [User]
 }
 
