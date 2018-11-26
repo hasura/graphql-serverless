@@ -68,8 +68,6 @@ class AddUser(graphene.Mutation):
 
   user = graphene.Field(User)
   def mutate(self, info, name, balance):
-    print (name)
-    print (balance)
     user = UserModel(name=name, balance=balance)
     db_session.add(user)
     db_session.commit()
@@ -134,5 +132,10 @@ if (os.environ.get('LOCAL_DEVELOPMENT')):
 
 def lambda_handler(event, context):
   query = event['query']
-  variables = event['variables']
-  return schema.execute(query)
+  executionResult = schema.execute(query)
+  response = {
+    "data": dict(executionResult.data) if executionResult.data != None else None,
+    "errors": dict(executionResult.errors) if executionResult.errors != None else None,
+  }
+  return json.dumps(response)
+
