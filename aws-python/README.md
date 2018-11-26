@@ -6,7 +6,7 @@ These are GraphQL backend boilerplates in Python that can be deployed on AWS Lam
 
 You can choose a boilerplate for your favourite GraphQL framework and ORM from below:
 
-[graphql-sqlalchemy](graphql-sqlalchemy)
+[graphene-sqlalchemy](graphene-sqlalchemy)
 
 ## Schema
 
@@ -20,6 +20,7 @@ type User {
 }
 
 type Query {
+  hello:  String
   users:  [User]
 }
 
