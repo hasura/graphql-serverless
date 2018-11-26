@@ -55,7 +55,7 @@ $ export POSTGRES_CONNECTION_STRING='postgres://username:password@rds-database-e
 2) Next, lets create the tables required for our schema. The SQL commands are in `migrations.sql` file.
 
 ```bash
-$ psql $POSTGRES_CONNECTION_STRING < migrations.sql
+$ psql $POSTGRES_CONNECTION_STRING < ../migrations.sql
 ```
 
 3) Now, you can start a development environment by setting an environment variable before running the code:
