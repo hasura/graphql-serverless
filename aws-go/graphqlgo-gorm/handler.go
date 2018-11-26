@@ -20,7 +20,7 @@ import (
 var (
 	POSTGRES_CONNECTION_STRING = func () string {
 		connection_string := "postgres://postgres:password@localhost:6432/postgres"
-		if cs := os.Getenv("POSTGRES_CONNECTION_STRING"); cs != "" {
+		if cs := os.Getenv("POSTGRES_CONNECTION_STRING"); cs == "" {
 			connection_string = cs
 		}
 		return connection_string
@@ -53,6 +53,12 @@ var userType = g.NewObject(g.ObjectConfig{
 var rootQuery = g.NewObject(g.ObjectConfig{
 	Name: "Query",
 	Fields: g.Fields{
+		"hello": &g.Field{
+			Type: g.String,
+			Resolve: func(p g.ResolveParams) (interface{}, error) {
+				return "world", nil
+			},
+		},
 		"users": &g.Field{
 			Type: g.NewList(userType),
 			Resolve: func (p g.ResolveParams) (interface{}, error) {
@@ -61,7 +67,7 @@ var rootQuery = g.NewObject(g.ObjectConfig{
 				if result.Error != nil{
 					return nil, result.Error
 				}
-				return result.Value, nil
+				return users, nil
 			},
 		},
 	},
