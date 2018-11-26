@@ -16,10 +16,8 @@ The boilerplates in this repo provide sample source code to solve the above prob
 
 Get started with the following languages and serverless platforms:
 
+[NodeJS + AWS Lambda](aws-nodejs/apollo-sequelize)
 
-[Go + AWS Lambda](https://github.com/hasura/graphql-serverless/tree/master/aws-go)
+[Python + AWS Lambda](aws-python/graphene-sqlalchmey)
 
-[NodeJS + AWS Lambda](https://github.com/hasura/graphql-serverless/tree/master/aws-nodejs)
-
-[Python + AWS Lambda](https://github.com/hasura/graphql-serverless/tree/master/aws-python/graphene-sqlalchmey)
-
+[Go + AWS Lambda](aws-go/graphqlgo-gorm)

@@ -229,7 +229,7 @@ func main() {
 	}
 	defer DB.Close()
 	// run a graphql server in  local development mode
-	if isLocal := os.Getenv("LAMBDA_EXECUTION_ENVIRONMENT"); isLocal == "local" {
+	if isLocal := os.Getenv("LAMBDA_LOCAL_DEVELOPMENT"); isLocal == "1" {
 		http.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
 			graphqlRequest := func (r *http.Request) GraphQLRequest {
 				query := r.URL.Query().Get("query")

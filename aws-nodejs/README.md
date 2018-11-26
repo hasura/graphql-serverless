@@ -32,7 +32,7 @@ type Mutation {
 
 ## Development
 
-These boilerplates do not require any additional tooling for local development. Just set the environment variable `LAMBDA_EXECUTION_ENVIRONMENT=local` and you are good to go.
+These boilerplates do not require any additional tooling for local development. Just set the environment variable `LAMBDA_LOCAL_DEVELOPMENT=1` and you are good to go.
 
 Detailed steps are available in individual readmes.
 

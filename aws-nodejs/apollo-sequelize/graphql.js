@@ -118,7 +118,7 @@ exports.handler = server.createHandler({
 });
 
 // For local development
-if( process.env.LAMBDA_EXECUTION_ENVIRONMENT == "local") {
+if( process.env.LAMBDA_LOCAL_DEVELOPMENT == "1") {
     const serverLocal = new ApolloServer({ typeDefs, resolvers });
 
     serverLocal.listen().then(({ url }) => {
