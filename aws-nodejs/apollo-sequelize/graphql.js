@@ -84,7 +84,7 @@ const resolvers = {
                 const resultFrom = await userFrom.save({transaction: t});
 
                 userTo.balance = userTo.balance + amount;
-                const resultTo = await userFrom.save({transaction: t});
+                const resultTo = await userTo.save({transaction: t});
 
                 return resultFrom;
 
