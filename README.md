@@ -18,6 +18,6 @@ Get started with the following languages and serverless platforms:
 
 [NodeJS + AWS Lambda](aws-nodejs/apollo-sequelize)
 
-[Python + AWS Lambda](aws-python/graphene-sqlalchmey)
+[Python + AWS Lambda](aws-python/graphene-sqlalchemy)
 
 [Go + AWS Lambda](aws-go/graphqlgo-gorm)
