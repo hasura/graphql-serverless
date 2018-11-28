@@ -113,7 +113,7 @@ Also, make sure to add the `POSTGRES_CONNECTION_STRING` environment variable.
 
 And that's it. Hit save and visit the endpoint again. You will see the graphql playground again.
 
-NOTE: You may have to edit the GraphQL URL in the playground to reflect the right endpoint ( same as the URL in the browser ).
+**IMPORTANT NOTE:** You may have to edit the GraphQL URL in the Playground to reflect the right endpoint ( same as the URL created by the API Gateway ). 
 
 ## Connection Pooling
 
