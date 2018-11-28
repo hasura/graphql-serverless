@@ -63,7 +63,7 @@ $ psql $POSTGRES_CONNECTION_STRING < ../migrations.sql
 3) Now, you can start a development environment by setting an environment variable before running the code:
 
 ```bash
-$ export LAMBDA_EXECUTION_ENVIRONMENT=local
+$ export LAMBDA_LOCAL_DEVELOPMENT=1
 ```
 
 4) Compile and execute the code:
