@@ -66,7 +66,7 @@ type Mutation {
 3. Next, lets create the tables required for our schema. The SQL commands are in `migrations.sql` file.
 
     ```bash
-    $ psql $POSTGRES_CONNECTION_STRING < ../migrations.sql
+    $ psql $POSTGRES_CONNECTION_STRING < ../../schema/migrations.sql
     ```
 
 4. Run the server with an environment variable `LAMBDA_LOCAL_DEVELOPMENT=1`
@@ -111,13 +111,13 @@ If you go to the endpoint, you will receive a "Hello from Lambda!" message. This
 
 As discussed in the main [readme](../../README.md), without connection pooling our GraphQL backend will not scale at the same rate as serverless invocations. With Postgres, we can add a standalone connection pooler like [pgBouncer](https://pgbouncer.github.io/) to accomplish this. 
 
-Deploying pgBouncer requires an EC2 instance. We can use the CloudFormation template present in this folder: [cloudformation.json](cloudformation.json) to deploy a pgBouncer EC2 instance in few clicks.
+Deploying pgBouncer requires an EC2 instance. We can use the CloudFormation template present in this folder: [cloudformation.json](../../cloudformation/cloudformation.json) to deploy a pgBouncer EC2 instance in few clicks.
 
 #### Deploy pgBouncer
 
 1. Goto CloudFormation in AWS Console and select Create Stack.
 
-2. Upload the file [../cloudformation.json](../cloudformation.json) as the template.
+2. Upload the file [cloudformation.json](../../cloudformation/cloudformation.json) as the template.
 
 3. In the next step, fill in your Postgres connection details:
 
