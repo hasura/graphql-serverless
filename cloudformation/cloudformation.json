@@ -98,7 +98,7 @@
             "Description": "Port of Postgres instance",
             "Type": "Number",
             "ConstraintDescription": "must be valid port"
-        },        
+        },
         "DBUser": {
             "Description": "Username for Postgres database access",
             "Type": "String",
@@ -118,8 +118,9 @@
     "Mappings": {
         "AWSRegionAMIEC2" : {
         "us-east-1"        : {"Ubuntu16" : "ami-d15a75c7"},
-        "us-west-2"        : {"Ubuntu16" : "ami-746aba14"},
+	"us-east-2"        : {"Ubuntu16" : "ami-0653e888ec96eab9b"},
         "us-west-1"        : {"Ubuntu16" : "ami-a9a8e4c9"},
+        "us-west-2"        : {"Ubuntu16" : "ami-746aba14"},
         "eu-west-1"        : {"Ubuntu16" : "ami-844e0bf7"},
         "eu-central-1"     : {"Ubuntu16" : "ami-a9a557c6"},
         "ap-northeast-1"   : {"Ubuntu16" : "ami-d82efcb9"},
@@ -169,7 +170,7 @@
                                  "Description=cfn-hup daemon\n\n",
                                  "[Service]\n",
                                  "Type=simple\n",
-                                 "ExecStart=/opt/aws/bin/cfn-hup\n", 
+                                 "ExecStart=/opt/aws/bin/cfn-hup\n",
                                  "Restart=always\n\n",
                                  "[Install]\n",
                                  "WantedBy=multi-user.target"]]}
@@ -285,7 +286,7 @@
                      "         --resource EC2Instance ",
                      "         --configsets full_install ",
                      "         --region ", { "Ref" : "AWS::Region" }, "\n",
-        
+
                      "/opt/aws/bin/cfn-signal -e $? ",
                      "         --stack ", { "Ref" : "AWS::StackName" },
                      "         --resource EC2Instance ",
@@ -359,6 +360,6 @@
         "PostgresConnectionString" : {
             "Value" : { "Fn::Join" : ["", ["postgres://", {"Ref": "DBUser"}, ":", {"Ref": "DBPassword"}, "@", { "Fn::GetAtt" : [ "EC2Instance", "PublicDnsName" ] }, ":5432/", {"Ref": "DBName" }]] },
             "Description" : "Postgres Connection String"
-        }   
+        }
     }
 }
