@@ -138,13 +138,18 @@ if os.environ.get('LAMBDA_LOCAL_DEVELOPMENT') == '1':
 #############################################################################
 
 ############################ GRAPHQL HANDLER ################################
-def graphqlHandler(event, context):
+def graphqlHandler(eventRequestBody, context = {}):
+
+  try:
+    requestBody = json.loads(eventRequestBody)
+  except:
+    requestBody = {}
   query = ''
   variables = {}
-  if ('query' in event):
-    query = event['query']
-  if ('variables' in event):
-    variables = event['variables']
+  if ('query' in requestBody):
+    query = requestBody['query']
+  if ('variables' in requestBody):
+    variables = requestBody['variables']
   executionResult = schema.execute(query, variables=variables)
 
   responseBody = {
@@ -166,28 +171,21 @@ responseHeaders = {
 }
 
 def lambda_handler(event, context):
-  try:
-    body = json.loads(event['body'])
-  except:
-    if (event['httpMethod'] == 'OPTIONS'):
-      return {
-        'statusCode': 200,
-        'headers': responseHeaders,
-        'body': ''
-      }
+  httpMethod = event.get('httpMethod')
+  if (httpMethod == 'OPTIONS'):
     return {
-      "statusCode": 400,
-      "body": json.dumps({'message': 'Unable to parse request body'}),
-      'headers': responseHeaders
+      'statusCode': 200,
+      'headers': responseHeaders,
+      'body': ''
     }
-  responseBody = graphqlHandler(body, context)
-  response = {
+  requestBody = event.get('body')
+  responseBody = graphqlHandler(requestBody, context)
+  return {
     'statusCode': 200,
     'headers': responseHeaders,
     'body': json.dumps(responseBody)
-    }
-  if ('errors' in responseBody and responseBody['errors'] != None):
-    response['statusCode'] = 400
-  return response
+  }
+    
 
 ###############################################################################
+
