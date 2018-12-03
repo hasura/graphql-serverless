@@ -38,8 +38,8 @@ def init_db():
 ################################## MODELS ###################################
 
 class UserModel (Base):
-  __tablename__ = 'user'
-  id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
+  __tablename__ = 'users'
+  id = Column(Integer, Sequence('users_id_seq'), primary_key=True)
   name = Column(String)
   balance = Column(Integer)
 
@@ -137,12 +137,52 @@ if os.environ.get('LAMBDA_LOCAL_DEVELOPMENT') == '1':
     app.run()
 #############################################################################
 
-def lambda_handler(event, context):
-  query = event['query']
-  executionResult = schema.execute(query)
-  response = {
-    "data": dict(executionResult.data) if executionResult.data != None else None,
-    "errors": dict(executionResult.errors) if executionResult.errors != None else None,
-  }
-  return json.dumps(response)
+############################ GRAPHQL HANDLER ################################
+def graphqlHandler(event, context):
+  query = ''
+  variables = {}
+  if ('query' in event):
+    query = event['query']
+  if ('variables' in event):
+    variables = event['variables']
+  executionResult = schema.execute(query, variables=variables)
 
+  responseBody = {
+    "data": dict(executionResult.data) if executionResult.data != None else None,
+  }
+  if (executionResult.errors != None):
+    responseBody['errors'] = []
+    for error in executionResult.errors:
+      responseBody['errors'].append(str(error))
+  return responseBody
+
+######################### LAMBDA HANDLER ####################################
+
+def lambda_handler(event, context):
+  try:
+    print ('Received Event:')
+    print (event);
+    body = json.loads(event['body'])
+    print ('Request Body:')
+    print (json.dumps(body))
+  except:
+    return {
+        "statusCode": 400,
+        "body": json.dumps({'message': 'Unable to parse request body'})
+    }
+  responseBody = graphqlHandler(body, context)
+  response = {
+    'statusCode': 200,
+    'headers': {
+      'Content-Type': 'application/json',
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
+      "Access-Control-Allow-Headers": "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization",
+    },
+    'body': json.dumps(responseBody)
+    }
+  if ('errors' in responseBody and responseBody['errors'] != None):
+    response['statusCode'] = 400
+  return response
+
+###############################################################################
