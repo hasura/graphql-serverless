@@ -158,27 +158,32 @@ def graphqlHandler(event, context):
 
 ######################### LAMBDA HANDLER ####################################
 
+responseHeaders = {
+  'Content-Type': 'application/json',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
+  "Access-Control-Allow-Headers": "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization",
+}
+
 def lambda_handler(event, context):
   try:
-    print ('Received Event:')
-    print (event);
     body = json.loads(event['body'])
-    print ('Request Body:')
-    print (json.dumps(body))
   except:
+    if (event['httpMethod'] == 'OPTIONS'):
+      return {
+        'statusCode': 200,
+        'headers': responseHeaders,
+        'body': ''
+      }
     return {
-        "statusCode": 400,
-        "body": json.dumps({'message': 'Unable to parse request body'})
+      "statusCode": 400,
+      "body": json.dumps({'message': 'Unable to parse request body'}),
+      'headers': responseHeaders
     }
   responseBody = graphqlHandler(body, context)
   response = {
     'statusCode': 200,
-    'headers': {
-      'Content-Type': 'application/json',
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
-      "Access-Control-Allow-Headers": "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization",
-    },
+    'headers': responseHeaders,
     'body': json.dumps(responseBody)
     }
   if ('errors' in responseBody and responseBody['errors'] != None):
