@@ -38,8 +38,8 @@ def init_db():
 ################################## MODELS ###################################
 
 class UserModel (Base):
-  __tablename__ = 'user'
-  id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
+  __tablename__ = 'users'
+  id = Column(Integer, Sequence('users_id_seq'), primary_key=True)
   name = Column(String)
   balance = Column(Integer)
 
@@ -137,12 +137,55 @@ if os.environ.get('LAMBDA_LOCAL_DEVELOPMENT') == '1':
     app.run()
 #############################################################################
 
-def lambda_handler(event, context):
-  query = event['query']
-  executionResult = schema.execute(query)
-  response = {
+############################ GRAPHQL HANDLER ################################
+def graphqlHandler(eventRequestBody, context = {}):
+
+  try:
+    requestBody = json.loads(eventRequestBody)
+  except:
+    requestBody = {}
+  query = ''
+  variables = {}
+  if ('query' in requestBody):
+    query = requestBody['query']
+  if ('variables' in requestBody):
+    variables = requestBody['variables']
+  executionResult = schema.execute(query, variables=variables)
+
+  responseBody = {
     "data": dict(executionResult.data) if executionResult.data != None else None,
-    "errors": dict(executionResult.errors) if executionResult.errors != None else None,
   }
-  return json.dumps(response)
+  if (executionResult.errors != None):
+    responseBody['errors'] = []
+    for error in executionResult.errors:
+      responseBody['errors'].append(str(error))
+  return responseBody
+
+######################### LAMBDA HANDLER ####################################
+
+responseHeaders = {
+  'Content-Type': 'application/json',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
+  "Access-Control-Allow-Headers": "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization",
+}
+
+def lambda_handler(event, context):
+  httpMethod = event.get('httpMethod')
+  if (httpMethod == 'OPTIONS'):
+    return {
+      'statusCode': 200,
+      'headers': responseHeaders,
+      'body': ''
+    }
+  requestBody = event.get('body')
+  responseBody = graphqlHandler(requestBody, context)
+  return {
+    'statusCode': 200,
+    'headers': responseHeaders,
+    'body': json.dumps(responseBody)
+  }
+    
+
+###############################################################################
 
