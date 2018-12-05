@@ -108,7 +108,7 @@ Save your changes. You will receive a HTTPS endpoint for your lambda.
 
 If you go to the endpoint, you will receive a "Hello from Lambda!" message. This is because we haven't uploaded any code yet!
 
-4) Upload code: You need to upload the zip of the binary in Lambda:
+4) Zip and upload code. Make sure to set the handler as `handler` and add the `POSTGRES_CONNECTION_STRING` environment variable:
 
 ```bash
 $ zip handler.zip ./handler

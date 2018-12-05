@@ -105,9 +105,7 @@ If you go to the endpoint, you will receive a "Hello from Lambda!" message. This
    $ ./package.sh
    ```
 
-5. Make sure to add the `POSTGRES_CONNECTION_STRING` environment variable.
-
-6. Finally upload the code while setting the handler as `main.lambda_handler`.
+5. Finally upload the code. Make sure to set the handler as `main.lambda_handler` and add the `POSTGRES_CONNECTION_STRING` environment variable.
 
 ## Connection Pooling
 

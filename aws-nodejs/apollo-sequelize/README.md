@@ -101,13 +101,11 @@ Save your changes. You will receive a HTTPS endpoint for your lambda.
 
 If you go to the endpoint, you will receive a "Hello from Lambda!" message. This is because we haven't uploaded any code yet!
 
-4) Zip and upload code: 
+4) Zip and upload code. Make sure to set the handler as `graphql.handler` and add the `POSTGRES_CONNECTION_STRING` environment variable:
 
 ```bash
 $ zip -r graphql.zip *
 ```
-
-Also, make sure to add the `POSTGRES_CONNECTION_STRING` environment variable.
 
 ![upload-code](../../_assets/upload-code.png)
 
