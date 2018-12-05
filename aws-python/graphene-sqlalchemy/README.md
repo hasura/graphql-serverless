@@ -47,7 +47,7 @@ type Mutation {
     cd graphql-serverless/aws-python/graphene-sqlalchemy
     ```
 
-1. Set up your development environment
+2. Set up your development environment
     ```bash
     pip install virtualenv
     virtualenv env
@@ -55,7 +55,7 @@ type Mutation {
     pip install -r requirements.txt
     ```
 
-2. Set required environment variables
+3. Set required environment variables
 
     ```bash
     # your postgres connection string
@@ -63,19 +63,27 @@ type Mutation {
     ```
 
 
-3. Next, lets create the tables required for our schema. The SQL commands are in `migrations.sql` file.
+4. Next, lets create the tables required for our schema. The SQL commands are in `migrations.sql` file.
 
     ```bash
     $ psql $POSTGRES_CONNECTION_STRING < ../../schema/migrations.sql
     ```
 
-4. Run the server with an environment variable `LAMBDA_LOCAL_DEVELOPMENT=1`
+5. Run the server with an environment variable `LAMBDA_LOCAL_DEVELOPMENT=1`
 
     ```bash
     LAMBDA_LOCAL_DEVELOPMENT=1 ./main.py 
     ```
 
-5. Try out graphql queries at `http://localhost:5000/graphql`
+6. Try out graphql queries at `http://localhost:5000/graphql`
+
+7. (Optional) Open GraphiQL using [graphQurl](https://github.com/hasura/graphqurl). `graphQurl` gives a local graphiQL environment for any graphql endpoint:
+
+```bash
+$ gq http://localhost:5000/graphql -i
+```
+
+![graphiql-graphqurl](../assets/graphiql-graphqurl.png)
 
 ## Deployment
 
