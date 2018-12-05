@@ -41,11 +41,12 @@ type Mutation {
 
 ## Development
 
-The sample source code is present in `handler.go`. Make sure you are in the `aws-go/graphqlgo-gorm` folder:
+The sample source code is present in `handler.go`. Clone the repo and go to `aws-go/graphqlgo-gorm` folder:
 
 ```bash
-$ pwd
-/home/tselvan/graphql-serverless/aws-go/graphqlgo-gorm
+
+$ git clone git@github.com:hasura/graphql-serverless
+$ cd graphql-serverless/aws-go/graphqlgo-gorm
 ```
 
 1) First, let's set the environment variable for connecting to the postgres instance on RDS. You can find this endpoint on your RDS instances page on AWS console:
@@ -54,7 +55,7 @@ $ pwd
 $ export POSTGRES_CONNECTION_STRING='postgres://username:password@rds-database-endpoint.us-east-1.rds.amazonaws.com:5432/mydb' 
 ```
 
-2) Next, lets create the tables required for our schema. The SQL commands are in `../migrations.sql` file.
+2) Next, lets create the tables required for our schema. The SQL commands are in `migrations.sql` file.
 
 ```bash
 $ psql $POSTGRES_CONNECTION_STRING < ../../schema/migrations.sql

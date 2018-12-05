@@ -40,11 +40,11 @@ type Mutation {
 
 ## Development
 
-The sample source code is present in `graphql.js`. Make sure you are in the `aws-nodejs/apollo-sequelize` folder:
+The sample source code is present in `graphql.js`. Clone the repo and go to `aws-nodejs/apollo-sequelize` folder:
 
 ```bash
-$ pwd
-/home/tselvan/graphql-serverless/aws-nodejs/apollo-sequelize
+$ git clone git@github.com:hasura/graphql-serverless
+$ cd graphql-serverless/aws-nodejs/apollo-sequelize
 ```
 
 1) First, let's set the environment variable for connecting to the postgres instance on RDS. You can find this endpoint on your RDS instances page on AWS console:
