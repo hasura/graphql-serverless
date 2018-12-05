@@ -17,6 +17,8 @@ The only way to solve these problems are:
 1) Setup a simple development/deployment workflow on serverless which is reliable.
 2) Setup a connection pool for managing database connections in serverless backends.
 
+## Getting Started
+
 The boilerplates in this repo provide sample source code for building GraphQL backends while solving the above problems:
 
 Get started with the following languages and serverless platforms:
