@@ -85,19 +85,19 @@ Now that you have run the graphql service locally and made any required changes,
 
 1) Create a Lambda function by clicking on Create Function on your Lambda console. Choose the `NodeJS 8.10` runtime and `lambda_basic_execution` role.
 
-![create-lambda](../assets/create-lambda.png)
+![create-lambda](../../_assets/create-lambda.png)
 
 2) In the next page (or Lambda instance page), select API Gateway as the trigger.
 
-![create-api-gateway](../assets/create-api-gateway.png)
+![create-api-gateway](../../_assets/create-api-gateway.png)
 
 3) Configure the API Gateway as you wish. The simplest configuration is shown below.
 
-![configure-api-gateway](../assets/configure-api-gateway.png)
+![configure-api-gateway](../../_assets/configure-api-gateway.png)
 
 Save your changes. You will receive a HTTPS endpoint for your lambda.
 
-![output-api-gateway](../assets/output-api-gateway.png)
+![output-api-gateway](../../_assets/output-api-gateway.png)
 
 If you go to the endpoint, you will receive a "Hello from Lambda!" message. This is because we haven't uploaded any code yet!
 
@@ -109,7 +109,7 @@ $ zip -r graphql.zip *
 
 Also, make sure to add the `POSTGRES_CONNECTION_STRING` environment variable.
 
-![upload-code](../assets/upload-code.png)
+![upload-code](../../_assets/upload-code.png)
 
 And that's it. Hit save and visit the endpoint again. You will see the graphql playground again.
 
@@ -129,13 +129,13 @@ Deploying pgBouncer requires an EC2 instance. We can use the CloudFormation temp
 
 3. In the next step, fill in your Postgres connection details:
 
-![cloudformation-params](../assets/cloudformation-params.png)
+![cloudformation-params](../../_assets/cloudformation-params.png)
 
 4. You do not need any other configuration, so just continue by clicking NEXT and finally click CREATE.
 
 5. After the creation is complete, you will see your new `POSTGRES_CONNECTION_STRING` in the output:
 
-![cloudformation-output](../assets/cloudformation-output.png)
+![cloudformation-output](../../_assets/cloudformation-output.png)
 
 Now, change your `POSTGRES_CONNECTION_STRING` in your lambda function to the new value. And, everything should just work!
 
