@@ -1,25 +1,34 @@
 # GraphQL Serverless
 
-GraphQL backend boilerplates that can be deployed on serverless platforms.
+This repository contains a set of GraphQL backend boilerplates that can be deployed on serverless platforms like AWS Lambda.
 
-In theory, GraphQL and Serverless are supposed to work well together. Serverless gives a scalable and no-ops platform to deploy a GraphQL backend instantly. Although in practice, there are few reasons why this may not work: 
+## The Fundamental Problem: Database Connections
 
-1) **Serverless is new**:
+In theory, hosting a GraphQL backend on serverless is very useful. Serverless gives a scalable and "no-ops" platform to deploy applications instantly. Although in practice, there is a fundamental bottleneck when using it for something like a GraphQL backend: **state management**.
 
-Development, testing and deployment mechanisms on serverless are not mature. Although there are few tools out there which ease out some of the processes, these tools are rapidly changing.
+Serverless backends cannot hold state between different requests. This means that state must be recreated in each serverless request. In the case of a GraphQL backend, a database connection must be created and destroyed in each request which not only is very slow in performance but also consumes the database resources very quickly.
 
-2) **Managing state in serverless**:
+In this repo, we show a way to mitigate this problem by using a lightweight connection manager to loadbalance the requests to the database.
 
-Serverless backends cannot hold state between different requests. This means the state must be created and destroyed in each serverless request which becomes a bottleneck. In the case of GraphQL backend, a database connection must be created in each request which quickly exhausts the database limits.
+## Connection Pooling
 
-The only way to solve these problems are:
+Without connection pooling our GraphQL backend will not scale at the same rate as serverless invocations. With Postgres, we can add a standalone connection pooler like [pgBouncer](https://pgbouncer.github.io/) to proxy our connections.
 
-1) Setup a simple development/deployment workflow on serverless which is reliable.
-2) Setup a connection pool for managing database connections in serverless backends.
+We will deploy pgBouncer on a free EC2 instance. We can use the CloudFormation template present in this repo: [cloudformation.json](cloudformation/cloudformation.json) to deploy a pgBouncer EC2 instance in few clicks.
+
+#### Results
+
+Using pgBouncer, here are typical results for corresponding rate of Lambda invocations. The tests were conducted with the `addUser` mutation using [jmeter](https://jmeter.apache.org/).
+
+|  Error Rate -> | Without pgBouncer | With pgBouncer|
+| -------------- | ----------------- | ------------- |
+| 100 req/s      | 86%               | 0%            |
+| 1000 req/s     | 92%               | 4%            |
+| 10000 req/s    | NA                | 3%            |
+
+Note: The table above indicates the success (2xx) or failure (non-2xx) of requests and not the throughput of the requests.
 
 ## Getting Started
-
-The boilerplates in this repo provide sample source code for building GraphQL backends while solving the above problems:
 
 Get started with the following languages and serverless platforms:
 
@@ -28,6 +37,26 @@ Get started with the following languages and serverless platforms:
 [Python + AWS Lambda](aws-python/graphene-sqlalchemy)
 
 [Go + AWS Lambda](aws-go/graphqlgo-gorm)
+
+These are basic "Hello World" boilerplates with the following GraphQL schema:
+
+```
+type User {
+  id:       Int
+  name:     String
+  balance:  Int
+}
+
+type Query {
+  hello:  String
+  users:  [User]
+}
+
+type Mutation {
+  addUser(name: String, balance: Int): User
+  transfer(userIdFrom: Int, userIdTo: Int, amount: Int): User
+}
+```
 
 ### Using with Hasura GraphQL Engine (Optional)
 
