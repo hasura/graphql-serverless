@@ -14,6 +14,8 @@ In this repo, we show a way to mitigate this problem by using a lightweight conn
 
 Without connection pooling our GraphQL backend will not scale at the same rate as serverless invocations. With Postgres, we can add a standalone connection pooler like [pgBouncer](https://pgbouncer.github.io/) to proxy our connections.
 
+![architecture](_assets/architecture.png)
+
 We will deploy pgBouncer on a free EC2 instance. We can use the CloudFormation template present in this repo: [cloudformation.json](cloudformation/cloudformation.json) to deploy a pgBouncer EC2 instance in few clicks.
 
 #### Results
