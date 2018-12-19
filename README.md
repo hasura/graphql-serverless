@@ -63,3 +63,9 @@ type Mutation {
 While you can use these boilerplates to create any kind of GraphQL schema, you may wish to merge your schema with [Hasura GraphQL Engine](https://hasura.io) to augment your schema with a wide range of CRUD APIs.
 
 Follow this guide to merge your schema with Hasura: [using-with-hasura.md](using-with-hasura.md)
+
+## CONTRIBUTING
+
+We strongly encourage contributions of boilerplates in other languages, frameworks/ORM or serverless platforms. Please follow [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on contributing.
+
+Check out some of the [open issues](https://github.com/hasura/graphql-serverless/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) which require community help.
