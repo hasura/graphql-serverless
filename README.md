@@ -28,7 +28,7 @@ Using pgBouncer, here are typical results for corresponding rate of Lambda invoc
 | 1000 req/s     | 92%               | 4%            |
 | 10000 req/s    | NA                | 3%            |
 
-Note: The table above indicates the success (2xx) or failure (non-2xx) of requests and not the throughput of the requests.
+Note: The table above indicates the success (2xx) or failure (non-2xx) of requests when instantiated at X req/s and not the throughput of those requests.
 
 ## Getting Started
 
