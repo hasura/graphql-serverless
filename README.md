@@ -62,7 +62,7 @@ type Mutation {
 
 ### Using with Hasura GraphQL Engine (Optional)
 
-While you can use these boilerplates to create any kind of GraphQL schema, you may wish to merge your schema with [Hasura GraphQL Engine](https://hasura.io) to augment your schema with a wide range of CRUD APIs.
+While you can use these boilerplates to create any kind of GraphQL schema you may wish to merge your schema with [Hasura GraphQL Engine](https://hasura.io) to augment your schema with high-performance CRUD and realtime GraphQL APIs.
 
 Follow this guide to merge your schema with Hasura: [using-with-hasura.md](using-with-hasura.md)
 
