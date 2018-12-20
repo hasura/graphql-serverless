@@ -2,34 +2,6 @@
 
 This repository contains a set of GraphQL backend boilerplates that can be deployed on serverless platforms like AWS Lambda.
 
-## The Fundamental Problem: Database Connections
-
-In theory, hosting a GraphQL backend on serverless is very useful. Serverless gives a scalable and "no-ops" platform to deploy applications instantly. Although in practice, there is a fundamental bottleneck when using it for something like a GraphQL backend: **state management**.
-
-Serverless backends cannot hold state between different requests. This means that state must be recreated in each serverless request. In the case of a GraphQL backend, a database connection must be created and destroyed in each request which not only is very slow in performance but also consumes the database resources very quickly.
-
-In this repo, we show a way to mitigate this problem by using a lightweight connection manager to loadbalance the requests to the database.
-
-## Connection Pooling
-
-Without connection pooling our GraphQL backend will not scale at the same rate as serverless invocations. With Postgres, we can add a standalone connection pooler like [pgBouncer](https://pgbouncer.github.io/) to proxy our connections.
-
-![architecture](_assets/architecture.png)
-
-We will deploy pgBouncer on a free EC2 instance. We can use the CloudFormation template present in this repo: [cloudformation.json](cloudformation/cloudformation.json) to deploy a pgBouncer EC2 instance in few clicks.
-
-#### Results
-
-Using pgBouncer, here are typical results for corresponding rate of Lambda invocations. The tests were conducted with the `addUser` mutation using [jmeter](https://jmeter.apache.org/).
-
-|  Error Rate -> | Without pgBouncer | With pgBouncer|
-| -------------- | ----------------- | ------------- |
-| 100 req/s      | 86%               | 0%            |
-| 1000 req/s     | 92%               | 4%            |
-| 10000 req/s    | NA                | 3%            |
-
-Note: The table above indicates the success (2xx) or failure (non-2xx) of requests when instantiated at X req/s and not the throughput of those requests.
-
 ## Getting Started
 
 Get started with the following languages and serverless platforms:
@@ -59,6 +31,34 @@ type Mutation {
   transfer(userIdFrom: Int, userIdTo: Int, amount: Int): User
 }
 ```
+
+## Problem with Database Connections
+
+In theory, hosting a GraphQL backend on serverless is very useful. Serverless gives a scalable and "no-ops" platform to deploy applications instantly. Although in practice, there is a fundamental bottleneck when using it for something like a GraphQL backend: **state management**.
+
+Serverless backends cannot hold state between different requests. This means that state must be recreated in each serverless request. In the case of a GraphQL backend, a database connection must be created and destroyed in each request which not only is very slow in performance but also consumes the database resources very quickly.
+
+In this repo, we show a way to mitigate this problem by using a lightweight connection manager to loadbalance the requests to the database.
+
+## Connection Pooling
+
+Without connection pooling our GraphQL backend will not scale at the same rate as serverless invocations. With Postgres, we can add a standalone connection pooler like [pgBouncer](https://pgbouncer.github.io/) to proxy our connections.
+
+![architecture](_assets/architecture.png)
+
+We will deploy pgBouncer on a free EC2 instance. We can use the CloudFormation template present in this repo: [cloudformation.json](cloudformation/cloudformation.json) to deploy a pgBouncer EC2 instance in few clicks.
+
+#### Results
+
+Using pgBouncer, here are typical results for corresponding rate of Lambda invocations. The tests were conducted with the `addUser` mutation using [jmeter](https://jmeter.apache.org/).
+
+|  Error Rate -> | Without pgBouncer | With pgBouncer|
+| -------------- | ----------------- | ------------- |
+| 100 req/s      | 86%               | 0%            |
+| 1000 req/s     | 92%               | 4%            |
+| 10000 req/s    | NA                | 3%            |
+
+Note: The table above indicates the success (2xx) or failure (non-2xx) of requests when instantiated at X req/s and not the throughput of those requests.
 
 ### Using with Hasura GraphQL Engine (Optional)
 
