@@ -1,52 +1,62 @@
 # GraphQL Serverless
 
-This repository contains a set of GraphQL backend boilerplates that can be deployed on serverless platforms like AWS Lambda.
+This repository contains a set of GraphQL backend boilerplates. These are intended to be useful 
+references for setting up a dead-simple GraphQL resolver that can be deployed on a serverless platform
+and interact with a database (Postgres).
+
+Each boilerplate comprises of:
+1. A basic hello world setup
+```
+query {
+  hello
+}
+```
+
+2. Query resolvers that fetch from the database
+```
+query {
+  user {
+    id
+    name
+    balance
+  }
+}
+```
+
+3. A Mutation resolver that runs a transaction against the database
+```
+mutation {
+  transferMoney (userFrom, userTo, amount) {
+    result
+  }
+}
+```
+
+This repository is organised by the serverless platform and runtime which then breaks down into the GraphQL framework + ORM that is being used. For example, [aws-nodejs/apollo-sequelize](aws-nodejs/apollo-sequelize) is a boilerplate for running a GraphQL API on AWS Lambda with Nodejs using the apollo-server framework and the sequelize ORM.
+
 
 ## Getting Started
 
 Get started with the following languages and serverless platforms:
 
-[NodeJS + AWS Lambda](aws-nodejs/apollo-sequelize)
+- [aws-nodejs/apollo-sequelize](aws-nodejs/apollo-sequelize)
+- [aws-python/graphene-sqlalchemy](aws-python/graphene-sqlalchemy)
+- [aws-go/graphqlgo-gorm](aws-go/graphqlgo-gorm)
 
-[Python + AWS Lambda](aws-python/graphene-sqlalchemy)
 
-[Go + AWS Lambda](aws-go/graphqlgo-gorm)
+## Optional: Scaling database interactions for serverless
 
-These are basic "Hello World" boilerplates with the following GraphQL schema:
+In theory, hosting a GraphQL backend on serverless is very useful because serverless gives us a scalable and no-ops platform to deploy "business logic" instantly,
 
-```
-type User {
-  id:       Int
-  name:     String
-  balance:  Int
-}
+However, serverless backends cannot hold state between different requests because they are destroyed and re-created for every single invocation. This means that our GraphQL backend will cause a database connection to be created and destroyed for every invoation and will result in increased latency and be expensive for the database. A database is optimised for handling upto a few 100 long-living connections, and not a few thousand short-living connections.
 
-type Query {
-  hello:  String
-  users:  [User]
-}
+#### Connection pooling with pgBouncer
 
-type Mutation {
-  addUser(name: String, balance: Int): User
-  transfer(userIdFrom: Int, userIdTo: Int, amount: Int): User
-}
-```
-
-## Problem with Database Connections
-
-In theory, hosting a GraphQL backend on serverless is very useful. Serverless gives a scalable and "no-ops" platform to deploy applications instantly. Although in practice, there is a fundamental bottleneck when using it for something like a GraphQL backend: **state management**.
-
-Serverless backends cannot hold state between different requests. This means that state must be recreated in each serverless request. In the case of a GraphQL backend, a database connection must be created and destroyed in each request which not only is very slow in performance but also consumes the database resources very quickly.
-
-In this repo, we show a way to mitigate this problem by using a lightweight connection manager to loadbalance the requests to the database.
-
-## Connection Pooling
-
-Without connection pooling our GraphQL backend will not scale at the same rate as serverless invocations. With Postgres, we can add a standalone connection pooler like [pgBouncer](https://pgbouncer.github.io/) to proxy our connections.
+To make our GraphQL backend scale at the same rate as serverless invocations, we will use a standalone connection pooler like [pgBouncer](https://pgbouncer.github.io/) to proxy our connections to the database.
 
 ![architecture](_assets/architecture.png)
 
-We will deploy pgBouncer on a free EC2 instance. We can use the CloudFormation template present in this repo: [cloudformation.json](cloudformation/cloudformation.json) to deploy a pgBouncer EC2 instance in few clicks.
+pgBouncer maintains a persistent connection pool with the database but allows applications to create a large number of connections which it proxies to Postgres. We will deploy pgBouncer on a free EC2 instance. We can use the CloudFormation template present in this repo: [cloudformation.json](cloudformation/cloudformation.json) to deploy a pgBouncer EC2 instance in few clicks.
 
 #### Results
 
@@ -60,9 +70,9 @@ Using pgBouncer, here are typical results for corresponding rate of Lambda invoc
 
 Note: The table above indicates the success (2xx) or failure (non-2xx) of requests when instantiated at X req/s and not the throughput of those requests.
 
-### Using with Hasura GraphQL Engine (Optional)
+## Using with Hasura GraphQL Engine
 
-While you can use these boilerplates to create any kind of GraphQL schema you may wish to merge your schema with [Hasura GraphQL Engine](https://hasura.io) to augment your schema with high-performance CRUD and realtime GraphQL APIs.
+You can use these boilerplates to create any kind of GraphQL API. Resolvers that interact with other microservices or  with a database, we started putting together this repository you may wish to merge your schema with [Hasura GraphQL Engine](https://hasura.io) to augment your schema with high-performance CRUD and realtime GraphQL APIs.
 
 Follow this guide to merge your schema with Hasura: [using-with-hasura.md](using-with-hasura.md)
 
